@@ -80,7 +80,7 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        // checkCollisions();
+        checkCollisions(allEnemies, player);
     }
 
     /* This is called by the update function and loops through all of the
@@ -109,13 +109,21 @@ var Engine = (function(global) {
          */
         var rowImages = [
                 'images/grass-block.png',    // Top row is grass
-                'images/water-block.png',   // Row 1 of water
+                'images/stone-block.png',   // Row 1 of water
                 'images/stone-block.png',   // Row 1 of 3 of stone
                 'images/stone-block.png',   // Row 2 of 3 of stone
                 'images/stone-block.png',   // Row 3 of 3 of stone
                 'images/grass-block.png'   // Last row grass & player start position
-
             ],
+
+            rowOneImages = [
+                'images/grass-block.png',
+                'images/water-block.png',
+                'images/water-block.png',
+                'images/grass-block.png',
+                'images/grass-block.png'
+                ],
+
             numRows = 6,
             numCols = 5,
             row, col;
@@ -124,7 +132,12 @@ var Engine = (function(global) {
          * and, using the rowImages array, draw the correct image for that
          * portion of the "grid"
          */
-        for (row = 0; row < numRows; row++) {
+        for(row = 0; row < 1; row++) {
+            for(col = 0; col < numCols; col++) {
+                ctx.drawImage(Resources.get(rowOneImages[col]), col*101, row*83);
+            }
+        }
+        for (row = 1; row < numRows; row++) {
             for (col = 0; col < numCols; col++) {
                 /* The drawImage function of the canvas' context element
                  * requires 3 parameters: the image to draw, the x coordinate
