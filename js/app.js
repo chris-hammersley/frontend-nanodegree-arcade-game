@@ -61,6 +61,7 @@ function checkCollisions(enemy,player) {
         if((player.x - enemy[i].x < 50 && player.y - enemy[i].y < 50) && (player.x - enemy[i].x > -50 && player.y - enemy[i].y > -50 )) {
             // CH - player loses some booty when hit by bugs
             treasure--;
+            // CH - player gets reset to beginning position
             player.reset();
         }
     }
@@ -75,8 +76,7 @@ var Player = function(x,y) {
     this.reset();
 }
 
-// Reset player starting position after it hits bug
-// CH - STILL NEED to call reset function when player reaches water traps
+// Reset player starting position
 Player.prototype.reset = function() {
     this.x = 203;
     this.y = 407;
@@ -84,12 +84,12 @@ Player.prototype.reset = function() {
 
 // Update player position
 // Parameter: dt, a time delta between ticks
-// CH - added collision check
-// CH - added a game over check if treasure count dips below zero
 Player.prototype.update = function(dt) {
+    // CH - added a game over check if treasure count dips below zero
     if(treasure <= -1) {
         return gameOver();
     }
+    // CH - added collision check
     checkCollisions();
     this.x * dt;
     this.y * dt;
@@ -139,9 +139,9 @@ function gameOver() {
         // CH - then add a game over message
         ctx.font = '20px Arial';
         ctx.fillstyle = 'black';
-        ctx.fillText('Those Alien Cockroaches Took All Your Treasure!', 0, 100);
-        ctx.fillText('Your Game is Over.', 140, 130);
-        ctx.fillText('Click Your Browser Refresh Button to Play Again.', 0, 160);
+        ctx.fillText('Those Alien Cockroaches Took All Your Treasure!', 40, 100);
+        ctx.fillText('Your Game is Over.', 180, 130);
+        ctx.fillText('Click Your Browser Refresh Button to Play Again.', 40, 160);
         keyEnabled = false;
 }
 
