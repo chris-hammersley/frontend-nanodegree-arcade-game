@@ -6,8 +6,9 @@ var Enemy = function(y) {
     // CH - make horizontal start position random
     this.x = this.positionX();
     this.y = this.positionY();
-    // CH - adding speed array for bugs
-    this.speed = [50,250,75,300,125,175,350,500];
+    // CH - adding speedrange array for bugs
+    this.speedRange = [75, 500];
+    this.reset();
 }
 
 // CH - random X position for bugs
@@ -24,18 +25,20 @@ Enemy.prototype.positionY = function() {
 }
 
 // Reset bug's starting position after it runs off screen right
+// CH - also reset the bug speed
 Enemy.prototype.reset = function() {
+    this.x = this.positionX();
+    this.y = this.positionY();
+    this.speed = this.randomSpeed();
 }
 
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
-// CH - added random bug speed based on initial speed array
 // CH - reset bug position to random row & column (x,y) after it runs off screen 
 Enemy.prototype.update = function(dt) {
-    this.x += this.speed[Math.round(Math.random()*4)]*dt;
+    this.x += this.speed * dt;
     if (this.x > 505) {
-        this.x = this.positionX();
-        this.y = this.positionY();
+        this.reset();
     }
 }
 
@@ -45,8 +48,11 @@ Enemy.prototype.render = function() {
 }
 
 // Set random speed for the different bugs
-Enemy.prototype.speed = function() {
-    // write random speed function
+// CH - added random bug speed based on difference between initial speed array
+Enemy.prototype.randomSpeed = function() {
+    var minSpeed = this.speedRange[0],
+        maxSpeed = this.speedRange[1];
+    return Math.floor(Math.random() * (maxSpeed - minSpeed)) + minSpeed;
 }
 
 // CH - collision detection attempt 1; it allows 'close calls' with the bugs!
@@ -54,7 +60,7 @@ function checkCollisions(enemy,player) {
     for(var i in enemy) {
         if((player.x - enemy[i].x < 50 && player.y - enemy[i].y < 50) && (player.x - enemy[i].x > -50 && player.y - enemy[i].y > -50 )) {
             // CH - player loses some booty when hit by bugs
-            score--;
+            treasure--;
             player.reset();
         }
     }
@@ -79,7 +85,11 @@ Player.prototype.reset = function() {
 // Update player position
 // Parameter: dt, a time delta between ticks
 // CH - added collision check
+// CH - added a game over check if treasure count dips below zero
 Player.prototype.update = function(dt) {
+    if(treasure <= -1) {
+        return gameOver();
+    }
     checkCollisions();
     this.x * dt;
     this.y * dt;
@@ -90,7 +100,7 @@ Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 }
 
-// CH - add Random Objects for player to collect
+// CH - added Random Objects for player to collect
 var Booty = function() {
     this.bootyImages = ['images/Key.png', 'images/Star.png', 'images/Heart.png','images/Gem%20Blue.png', 'images/Gem%20Orange.png','images/Gem%20Green.png'];
     this.bootyPosX = [1, 101, 202, 303, 404];
@@ -102,9 +112,10 @@ var Booty = function() {
 
 Booty.prototype.update = function() {
     // CH - added scoring to the collection of booty
-    document.getElementById('score').innerHTML = "Score: " + score;
+    document.getElementById("treasure").innerHTML = 'Treasures Collected: ' + treasure;
+    // CH - added the collection of booty
     if(player.y <= this.y + 30 && player.y >= this.y - 30 && player.x <= this.x + 30 && player.x >= this.x -30) {
-        score++;
+        treasure++;
         this.bootyImage = this.bootyImages[Math.floor(Math.random() * 6)];
         this.x = this.bootyPosX[Math.floor(Math.random() * 5)];
         this.y = this.bootyPosY[Math.floor(Math.random() * 5)];
@@ -116,8 +127,23 @@ Booty.prototype.render = function() {
     ctx.drawImage(Resources.get(this.bootyImage), this.x, this.y);
 }
 
-// CH - created a variable to hold the score with initial value zero
-var score = 0;
+// CH - created a variable to hold the treasure with initial value zero
+var treasure = 0;
+
+// CH - Game Over if player score dips below 0
+function gameOver() {
+    var finalScore = document.getElementById("treasure");
+        finalScore.parentNode.removeChild(finalScore);
+        // CH - let's hide the game board
+        ctx.clearRect(0, 0, 909, 606);
+        // CH - then add a game over message
+        ctx.font = '20px Arial';
+        ctx.fillstyle = 'black';
+        ctx.fillText('Those Alien Cockroaches Took All Your Treasure!', 0, 100);
+        ctx.fillText('Your Game is Over.', 140, 130);
+        ctx.fillText('Click Your Browser Refresh Button to Play Again.', 0, 160);
+        keyEnabled = false;
+}
 
 // Allow user to input player movements
 Player.prototype.handleInput = function(key) {
@@ -154,7 +180,7 @@ var allEnemies=[bug1,bug2,bug3,bug4,bug5,bug6,bug7,bug8];
 // PLAYER
 var player = new Player();
 
-// KEY
+// TREASURE
 var booty = new Booty();
 
 // This listens for key presses and sends the keys to your
@@ -170,7 +196,7 @@ document.addEventListener('keyup', function(e) {
     player.handleInput(allowedKeys[e.keyCode]);
 });
 
-// Disable the arrow keys from affecting scroll bar 
+// CH - disable the arrow keys from affecting scroll bar 
 document.addEventListener('keydown', function(e) {
     if([37,38,39,40].indexOf(e.keyCode) > -1) {
         e.preventDefault();
