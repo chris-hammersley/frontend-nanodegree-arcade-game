@@ -95,6 +95,9 @@ var Engine = (function(global) {
             enemy.update(dt);
         });
         player.update();
+    // CH - added my booty object to the update function
+    // so random objects will show up on screen
+        booty.update();
     }
 
     /* This function initially draws the "game level", it will then call
@@ -108,14 +111,15 @@ var Engine = (function(global) {
          * for that particular row of the game level.
          */
         var rowImages = [
-                'images/grass-block.png',    // Top row is grass
-                'images/stone-block.png',   // Row 1 of water
-                'images/stone-block.png',   // Row 1 of 3 of stone
-                'images/stone-block.png',   // Row 2 of 3 of stone
-                'images/stone-block.png',   // Row 3 of 3 of stone
+                'images/grass-block.png',    // Top row not used
+                'images/stone-block.png',   // Row 1 of 4 of stone
+                'images/stone-block.png',   // Row 2 of 4 of stone
+                'images/stone-block.png',   // Row 3 of 4 of stone
+                'images/stone-block.png',   // Row 4 of 4 of stone
                 'images/grass-block.png'   // Last row grass & player start position
             ],
-
+        // CH - added an array for a different Row 1 to add some
+        // complexity with water traps and safe stone areas
             rowOneImages = [
                 'images/grass-block.png',
                 'images/water-block.png',
@@ -132,6 +136,7 @@ var Engine = (function(global) {
          * and, using the rowImages array, draw the correct image for that
          * portion of the "grid"
          */
+        // CH - added a FOR LOOP using the new Row 1 images array for the top row
         for(row = 0; row < 1; row++) {
             for(col = 0; col < numCols; col++) {
                 ctx.drawImage(Resources.get(rowOneImages[col]), col*101, row*83);
@@ -167,6 +172,8 @@ var Engine = (function(global) {
         });
 
         player.render();
+    // Added a call to my booty render function
+        booty.render();
     }
 
     /* This function does nothing but it could have been a good place to
@@ -187,7 +194,11 @@ var Engine = (function(global) {
         'images/grass-block.png',
         'images/enemy-bug.png',
         'images/char-boy.png',
-        'images/char-horn-girl.png'
+        'images/char-horn-girl.png',
+        'images/Key.png',
+        'images/Heart.png',
+        'images/Rock.png',
+        'images/Star.png'
     ]);
     Resources.onReady(init);
 

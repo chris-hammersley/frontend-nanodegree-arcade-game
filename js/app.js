@@ -1,8 +1,8 @@
 // Enemies our player must avoid
 var Enemy = function(y) {
     this.sprite = 'images/enemy-bug.png';
-    // Starting column position for bugs
-    this.startColumn = [63,145,228,312];
+    // Starting row position for bugs
+    this.startRow = [63,145,228,312];
     // making horizontal start position random
     this.x = this.positionX();
     this.y = this.positionY();
@@ -19,7 +19,7 @@ Enemy.prototype.positionX = function() {
 
 // Random Y position for bugs
 Enemy.prototype.positionY = function() {
-    var initialY = this.startColumn[Math.round(Math.random()*4)];
+    var initialY = this.startRow[Math.round(Math.random()*4)];
     return initialY;
 }
 
@@ -58,13 +58,13 @@ function checkCollisions(enemy,player) {
     }
 }
 
-// Now write your own player class
 // This class requires an update(), render() and
 // a handleInput() method.
 var Player = function(x,y) {
     this.sprite = 'images/char-horn-girl.png';
     this.x = x;
     this.y = y;
+    this.reset();
 }
 
 // Reset player starting position after it hits bug
@@ -86,6 +86,29 @@ Player.prototype.update = function(dt) {
 // Draw the player on the screen, required method for game
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+}
+
+// Add Random Object for player to collect
+var Booty = function() {
+    this.bootyImages = ['images/Key.png', 'images/Star.png', 'images/Heart.png'];
+    this.bootyPosX = [1, 101, 202, 303, 404];
+    this.bootyPosY = [63, 145, 228, 312, 396];
+    this.bootyImage = this.bootyImages[Math.floor(Math.random() * 3)];
+    this.x = this.bootyPosX[Math.floor(Math.random() * 5)];
+    this.y = this.bootyPosY[Math.floor(Math.random() * 5)];
+}
+
+Booty.prototype.update = function() {
+    if(player.y <= this.y + 30 && player.y >= this.y - 30 && player.x <= this.x + 30 && player.x >= this.x -30) {
+        this.bootyImage = this.bootyImages[Math.floor(Math.random() *3)];
+        this.x = this.bootyPosX[Math.floor(Math.random() * 5)];
+        this.y = this.bootyPosY[Math.floor(Math.random() * 5)];
+    }
+}
+
+// Draw the booty on the screen
+Booty.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.bootyImage), this.x, this.y);
 }
 
 // Allow user to input player movements
@@ -121,7 +144,10 @@ var bug8 = new Enemy();
 var allEnemies=[bug1,bug2,bug3,bug4,bug5,bug6,bug7,bug8];
 
 // PLAYER
-var player = new Player(203, 407);
+var player = new Player();
+
+// KEY
+var booty = new Booty();
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
@@ -135,3 +161,10 @@ document.addEventListener('keyup', function(e) {
 
     player.handleInput(allowedKeys[e.keyCode]);
 });
+
+// Disable the arrow keys from affecting scroll bar 
+document.addEventListener('keydown', function(e) {
+    if([37,38,39,40].indexOf(e.keyCode) > -1) {
+        e.preventDefault();
+    }
+}, false);
